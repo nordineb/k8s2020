@@ -10,7 +10,7 @@ COPY Dockerfile /Dockerfile
 RUN apt-get update
 
 # install the necessary tools
-RUN apt-get install -y apt-utils vim watch wget 
+RUN apt-get install -y apt-utils vim watch wget kubectx
 
 # expose 8080 so that we can use kubectl proxy command
 EXPOSE 8080

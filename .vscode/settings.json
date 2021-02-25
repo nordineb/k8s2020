@@ -1,0 +1,6 @@
+{
+    "editor.selectionClipboard": true,
+    "[yaml]": {
+        "editor.autoIndent": "advanced"
+      }
+}

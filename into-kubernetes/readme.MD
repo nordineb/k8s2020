@@ -4,8 +4,9 @@ docker volume create gcloudbekkops
 docker run -it --rm -v gcloudbekkops:/root/.config/gcloud google/cloud-sdk
 gcloud auth login
   
-gcloud config set project k8sfaggruppe2020
-gcloud container clusters get-credentials k8s-faggruppe-cluster --region europe-west3-c
+gcloud config set project k8s2021
+gcloud container clusters get-credentials k8s2021 --region europe-west3-c
+
 kubectl create namespace your-name-here
 kubectl get namespaces
 exit

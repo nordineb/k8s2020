@@ -12,5 +12,7 @@ Gitpod is a dev-environment-as-a-service and our workspace is configure with:
 
 ## Connect to our GKE cluster 
 👉 gcloud auth login
+
 👉 gcloud config set project k8s2021
+
 👉 gcloud container clusters get-credentials prod-cluster --zone europe-west3-a

@@ -1,6 +1,6 @@
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/nordineb/k8s2020/tree/master/into-kubernetes)
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=http://path-to-repo/sample.git)
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/nordineb/k8s2020.git)
 
 
 ## Gitpod
@@ -9,9 +9,6 @@ Gitpod is a developer-environment-as-a-service and this workspace is configure w
 * kubectlx/kubens
 * other stuff that we need for the workshop
 * All the vscode settings needed for the workshop 
-
-More information here:
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/nordineb/k8s2020)
 
 ## Connecting to our GKE cluster 
 1. gcloud auth login

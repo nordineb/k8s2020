@@ -10,3 +10,10 @@ ports:
 tasks:
   - init: echo 'init script' # runs during prebuild
     command: echo 'start script'
+
+vscode:
+  extensions:
+    - dinhani.copy-on-select
+    - ms-kubernetes-tools.vscode-kubernetes-tools
+    - redhat.vscode-yaml
+

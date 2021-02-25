@@ -1,5 +1,5 @@
 {
-    "editor.selectionClipboard": true,
+    "terminal.integrated.rightClickBehavior": "copyPaste",
     "[yaml]": {
         "editor.autoIndent": "advanced"
       }

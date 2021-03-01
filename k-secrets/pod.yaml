@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-app
+spec:
+  containers:
+  - image: gcr.io/google-samples/hello-app:1.0
+    name: hello-app
+    volumeMounts:
+      - name: secret-volume
+        readOnly: true
+        mountPath: "/etc/secret-volume"
+    resources:
+      limits:
+        memory: 64Mi
+        cpu: 200m
+      requests:
+        memory: 32Mi
+        cpu: 100m
+    env:
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: prod-db-secret
+          key: DB_USERNAME
+    envFrom:
+      - configMapRef:
+          name: my-config
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: prod-db-secret

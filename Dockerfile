@@ -3,6 +3,8 @@
 # Use the official image as a parent image.
 FROM google/cloud-sdk:latest
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 # put the dockerfile inside the image
 COPY Dockerfile /Dockerfile
 

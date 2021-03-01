@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-app-nordine
+spec:
+  containers:
+  - image: gcr.io/google-samples/hello-app:1.0
+    name: hello-app-nordine
+    volumeMounts:
+      - mountPath: /cache
+        name: cache-volume
+        emptyDir: {}
+      - mountPath: /directory-on-host
+        name: directory-on-host
+      - mountPath: "/mount/mypv1"
+        name: mypv1
+    resources:
+      limits:
+        memory: 64Mi
+        cpu: 200m
+      requests:
+        memory: 32Mi
+        cpu: 100m
+  volumes:
+    - name: mypv1
+      persistentVolumeClaim:
+        claimName: nordine

@@ -1,29 +1,26 @@
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/nordineb/k8s2020/tree/master/into-kubernetes)
-
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/nordineb/k8s2020.git)
-
-
-## Gitpod
+## (alt. 1) Workshop using Gitpod
 Gitpod is a developer-environment-as-a-service and this workspace is configure with:
 * gcloud SDK
 * kubectlx/kubens
-* other stuff that we need for the workshop
-* All the vscode settings needed for the workshop 
+* Vscode extensions and other things needed for the workshop 
 
-## Connecting to our GKE cluster 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/nordineb/k8s2020/tree/master/into-kubernetes)
+
+Connecting to our GKE cluster :
 1. gcloud auth login
-2. gcloud config set project k8s2021
-3. gcloud container clusters get-credentials prod-cluster --zone europe-west3-a
-4. kubectl create namespace nordine
-5. kubens nordine
+2. gcloud config set project xxxxxx
+3. gcloud container clusters get-credentials xxxxxx --zone xxxxxx
 
-Note: All nodes have public IPs and ports 30000-32767 are open so that we can demonstrate nodePort type
+## (alt. 2) Workshop using Google Cloud Shell Editor
+No need for configuration
 
-## Getting help
-```
-kubectl run --help
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/nordineb/k8s2020.git)
+
+## References for the workshop
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
+```
+kubectl run --help
 kubectl api-resources
 kubectl api-versions
 kubectl explain pods
@@ -31,7 +28,7 @@ kubectl explain pods.spec.containers.imagePullPolicy
 kubectl explain pods --recursive
 ```
 
-## Alias 
+## [Optional] Shell aliases
 ```
 alias k=kubectl
 alias kgp='k get po'
@@ -41,14 +38,18 @@ alias kdf='k delete -f'
 alias kex='k explain'
 alias ker='k explain --recursive'
 ```
+Autocompletion:
+https://kubernetes.io/docs/tasks/tools/install-kubectl/#enable-kubectl-autocompletion
 
-## VIM setup
+## Getting started
+
+👉 First thing to do is to switch to your own namespace. Don't use default default or one of the system namespaces 😅
 ```
-vi ~/.vimrc
-set ts=2 sts=2 sw=2 et number
+kubectl create namespace nordine
+kubens nordine
 ```
 
-## Inspecting resources
+Investigating `kubectl`
 ```
 kubectl get pod
 kubectl get pod -A
@@ -61,47 +62,108 @@ kubectl describe pods
 ```
 
 ## Create and configure pods
+
+`kubectl run`
 ```
-kubectl create hello-app-nordine --image=gcr.io/google-samples/hello-app:1.0
+kubectl run hello-app --image=gcr.io/google-samples/hello-app:1.0
 kubectl get pod -o wide
-kubectl describe pod nordinedep
-kubectl delete pod hello-app-nordine
+kubectl describe pod hello-app
+kubectl exec --stdin --tty hello-app -- wget -O- localhost:8080
+kubectl exec --stdin --tty hello-app -- /bin/sh
+kubectl delete pod hello-app
+```
 
-kubectl run hello-app-nordine --image=gcr.io/google-samples/hello-app:1.0
-kubectl get pod hello-app-nordine -o yaml > mypod.yml
+Export objects to YAML
+```
+kubectl run hello-app --image=gcr.io/google-samples/hello-app:1.0
+kubectl get pod hello-app-nordine -o yaml
+```
 
-kubectl run hello-app-nordine --image=gcr.io/google-samples/hello-app:1.0  --dry-run=client -o yaml > mypod.yaml 
+Scaffold YAML
+```
+kubectl run hello-app --image=gcr.io/google-samples/hello-app:1.0  --dry-run=client -o yaml > mypod.yaml 
 kubectl apply -f mypod.yml
 ```
-## Create and configure deployments
+
+'kubectl apply' vs 'kubectl create'
+Use apply
+
+
+Clean up
 ```
-kubectl create deployment nordinedep --image=gcr.io/google-samples/hello-app:1.0 --replicas=1
-kubectl describe deployment nordinedep
-kubectl logs deployment/nordinedep    
-kubectl get pods -o wide
-kubectl delete pod nordinedep-54f48f5865-tdzx8
-kubectl get pods
-```
-## scaling 
-```
-kubectl scale --current-replicas=1 --replicas=3 deployment/nordinedep
+kubectl delete pod hello-app
 ```
 
-## Replicasets 
+## Create and configure deployments
+
+### Replicasets 
 ```
-kubectl apply -f replicaset-yaml
+kubectl apply -f k-deployment/replicaset-yaml
+```
+Pods are recreated when they crash or are deleted
+### Scaling 
+```
+kubectl scale --current-replicas=1 --replicas=3 rs/frontend
+```
+
+### Deployments
+```
+kubectl create deployment hello-app --image=gcr.io/google-samples/hello-app:1.0 --replicas=1
+```
+👉 Notice how a replicaset was created
+👉 Deployment can be scaled with:
+```
+kubectl scale --current-replicas=1 --replicas=3 deployment/hello-app
+```
+
+Inspecting deployments
+```
+kubectl describe deployment hello-app
+kubectl logs deployment/hello-app  
+kubectl get pods -o wide
+kubectl get pods
 ```
 
 ## Create and configure services
 ```
-kubectl expose deployment nordinedep --type=NodePort --name=nordine-service --port 8080
-kubectl describe services nordine-service
+kubectl expose deployment hello-app --type=NodePort --name=hello-app-nodeport --port 8080
+kubectl describe services hello-app-nodeport
 
-kubectl expose deployment nordinedep --type=LoadBalancer --name=nordine-servicelb --port 80
-kubectl describe services nordine-servicelb
+kubectl expose deployment hello-app --type=LoadBalancer --name=hello-app-lb --port 80  --target-port=8080
+kubectl describe services hello-app-lb
 ```
 
-### Deployments, rolling updates, rollbacks
+## Limits/Quota
+```
+k run nginx  --image=nginx --replicas=3 --requests=cpu=0.100,memory=100Mi --limits=cpu=0.2,memory=100Mi
+```
+
+## Secrets
+
+Configmaps & Secrets reside in a namespace and can only be referenced by Pods in that same namespace. Sync configmaps and secrets manually og use https://github.com/contentful-labs/kube-secret-syncer
+
+```
+kubectl get secret|configmap <name>  --namespace=<source-namespace> --export -o yaml | kubectl apply --namespace=<destination-namespace> -f -
+```
+
+```
+kubectl create configmap my-config --from-literal=PORT=8081 --from-literal=ENABLE_LOGGING=1
+
+kubectl create secret generic prod-db-secret --from-literal=DB_USERNAME=admin --from-literal=DB_PASSWORD=Pass@Word2021!
+kubectl describe secret prod-db-secret
+
+kubectl apply -f pod-.yaml
+
+kubectl exec --stdin --tty hello-app-nordine -- /bin/sh
+
+
+```
+## Volumes
+```
+kubectl apply -f pvc.yaml
+kubectl apply -f pod-volume-demo.yaml
+kubectl exec --stdin --tty hello-app -- /bin/sh
+```
 
 ## Create and configure Jobs and CronJobs
 ```
@@ -110,34 +172,10 @@ k run job --dry-run=client -o yaml --image=busybox --restart=OnFailure -- /bin/s
 kubectl create cronjob nordine-cronjob --dry-run=client -o yaml --image=busybox --restart=OnFailure --schedule="*/1 * * * *" -- date 
 ```
 
-## ConfigMaps
-```
-kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2
-kubectl get configmap my-config 
-kubectl describe configmaps my-config
-```
-
-## Secrets
-```
-kubectl create secret generic my-secret --from-literal=key1=supersecret --from-literal=key2=topsecret
-kubectl describe secret my-secret
-
-```
-## Volumes
-```
-kubectl apply -f volume.yaml
-```
-
 ## SecurityContexts
 ```
 kubectl apply -f securitycontext.yaml
 ```
-
-## Limits/Quota
-```
-k run nginx  --image=nginx --replicas=3 --requests=cpu=0.100,memory=100Mi --limits=cpu=0.2,memory=100Mi
-```
-
 
 
 

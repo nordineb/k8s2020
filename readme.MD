@@ -43,7 +43,8 @@ https://kubernetes.io/docs/tasks/tools/install-kubectl/#enable-kubectl-autocompl
 
 ## Getting started
 
-👉 First thing to do is to switch to your own namespace. 
+👉 First thing to do is to switch to your own namespace.
+ 
 Don't use default default or one of the system namespaces 😅
 ```
 kubectl create namespace nordine
@@ -169,7 +170,6 @@ kubectl exec --stdin --tty hello-app-nordine -- /bin/sh
 ```
 
 ## Volumes
-
 This will require some explanations 😅
 ```
 kubectl apply -f k-volumes/pvc.yaml

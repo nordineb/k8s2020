@@ -43,7 +43,8 @@ https://kubernetes.io/docs/tasks/tools/install-kubectl/#enable-kubectl-autocompl
 
 ## Getting started
 
-👉 First thing to do is to switch to your own namespace. Don't use default default or one of the system namespaces 😅
+👉 First thing to do is to switch to your own namespace. 
+Don't use default default or one of the system namespaces 😅
 ```
 kubectl create namespace nordine
 kubens nordine
@@ -85,9 +86,7 @@ kubectl run hello-app --image=gcr.io/google-samples/hello-app:1.0  --dry-run=cli
 kubectl apply -f mypod.yml
 ```
 
-'kubectl apply' vs 'kubectl create'
-Use apply
-
+`kubectl apply` vs `kubectl create`
 
 Clean up
 ```
@@ -111,6 +110,7 @@ kubectl scale --current-replicas=1 --replicas=3 rs/frontend
 kubectl create deployment hello-app --image=gcr.io/google-samples/hello-app:1.0 --replicas=1
 ```
 👉 Notice how a replicaset was created
+
 👉 Deployment can be scaled with:
 ```
 kubectl scale --current-replicas=1 --replicas=3 deployment/hello-app
@@ -146,22 +146,34 @@ Configmaps & Secrets reside in a namespace and can only be referenced by Pods in
 kubectl get secret|configmap <name>  --namespace=<source-namespace> --export -o yaml | kubectl apply --namespace=<destination-namespace> -f -
 ```
 
+Create a configmap
 ```
 kubectl create configmap my-config --from-literal=PORT=8081 --from-literal=ENABLE_LOGGING=1
+```
 
+Create a secret
+```
 kubectl create secret generic prod-db-secret --from-literal=DB_USERNAME=admin --from-literal=DB_PASSWORD=Pass@Word2021!
+```
+
+Inspect configmaps and secrets
+```
+kubectl describe configmap my-config
 kubectl describe secret prod-db-secret
+```
 
-kubectl apply -f pod-.yaml
-
+Use them and inspect the pod
+```
+kubectl apply -f k-secrets/pod.yaml
 kubectl exec --stdin --tty hello-app-nordine -- /bin/sh
-
-
 ```
+
 ## Volumes
+
+This will require some explanations 😅
 ```
-kubectl apply -f pvc.yaml
-kubectl apply -f pod-volume-demo.yaml
+kubectl apply -f k-volumes/pvc.yaml
+kubectl apply -f k-volumes/pod-volume-demo.yaml
 kubectl exec --stdin --tty hello-app -- /bin/sh
 ```
 

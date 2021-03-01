@@ -135,9 +135,28 @@ kubectl describe services hello-app-lb
 ```
 
 ## Limits/Quota
+
+### namespace quotas
 ```
-k run nginx  --image=nginx --replicas=3 --requests=cpu=0.100,memory=100Mi --limits=cpu=0.2,memory=100Mi
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: mem-cpu-example
+spec:
+  hard:
+    requests.cpu: 2
+    requests.memory: 2Gi
+    limits.cpu: 3
+    limits.memory: 4Gi
 ```
+👉 When a namespace has a quota, all pods need to set a CPU request in their definition, otherwise they will not be scheduled.
+
+### pod quotas
+```
+kubectl run nginx  --image=nginx --replicas=3 --requests=cpu=0.100,memory=100Mi --limits=cpu=0.2,memory=100Mi  --dry-run=client -o yaml
+```
+
+Recomended reading: https://sysdig.com/blog/kubernetes-limits-requests/
 
 ## Secrets
 

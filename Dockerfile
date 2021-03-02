@@ -1,5 +1,3 @@
-
-
 # Use the official image as a parent image.
 FROM google/cloud-sdk:latest
 

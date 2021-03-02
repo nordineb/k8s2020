@@ -1,4 +1,16 @@
-## (alt. 1) Workshop using Gitpod
+# Kubernetes intro workshop
+
+This lab provides a walkthrough of the basics of the Kubernetes in about 90 minutes. It covers the following:
+* Create and monitor pods, deployments and services
+* Create Jobs
+* Use Config maps and Secrets
+* Configure Limits
+* Use Volumes
+
+## Choosing an IDE 
+Both Gitpod and Goople Cloud Shell are good options for this lab. 
+
+### Gitpod
 Gitpod is a developer-environment-as-a-service and this workspace is configure with:
 * gcloud SDK
 * kubectlx/kubens
@@ -6,29 +18,25 @@ Gitpod is a developer-environment-as-a-service and this workspace is configure w
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/nordineb/k8s2020/tree/master/into-kubernetes)
 
-Connecting to our GKE cluster :
+### Google Cloud Shell Editor
+
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/nordineb/k8s2020.git)
+
+## Connect to a Kubernetes cluster
+You can use any Kubernetes cluster for this lab. 
+
+### GKE cluster
 1. gcloud auth login
 2. gcloud config set project xxxxxx
 3. gcloud container clusters get-credentials xxxxxx --zone xxxxxx
 
-## (alt. 2) Workshop using Google Cloud Shell Editor
-No need for configuration
-
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/nordineb/k8s2020.git)
-
-## References for the workshop
-https://kubernetes.io/docs/reference/kubectl/cheatsheet/
-
 ```
-kubectl run --help
-kubectl api-resources
-kubectl api-versions
-kubectl explain pods
-kubectl explain pods.spec.containers.imagePullPolicy
-kubectl explain pods --recursive
+kubectl get nodes -o wide
+kubectl top node
 ```
 
 ## [Optional] Shell aliases
+If you want to type faster, these alias are good to have
 ```
 alias k=kubectl
 alias kgp='k get po'
@@ -38,34 +46,26 @@ alias kdf='k delete -f'
 alias kex='k explain'
 alias ker='k explain --recursive'
 ```
-Autocompletion:
+Bash autocompletion:
 https://kubernetes.io/docs/tasks/tools/install-kubectl/#enable-kubectl-autocompletion
 
 ## Getting started
 
-👉 First thing to do is to switch to your own namespace.
-
-Don't use default namespace or one of the system namespaces 😅
+### Create a namespaces
+The first thing to do is to switch to your own namespace. Don't use default namespace or one of the system namespaces. 
 ```
 kubectl create namespace nordine
 kubens nordine
 ```
 
-Investigating `kubectl`
-```
-kubectl get pod
-kubectl get pod -A
-kubectl get services
-kubectl get svc -A
-kubectl get nodes -o wide
-kubectl top pod -A
-kubectl top node
-kubectl describe pods
-```
+By default `kubetl` commands only apply to the current namespace, unless "--namespace" i explicitly provided.
 
-## Create and configure pods
+* When a namespace is deleted, all resources inside the namespaces are deleted
+* Namespaces can have resource limits
+* Resources with the same name kan be deployed into different namespoaces without conflicts.
 
-`kubectl run`
+## Creating Pods
+A Pod is the smallest unit of work that Kubernetes manages and consists of 1 or more containers. Containers in a Pod run in the same "sandbox"; they use the same network namespace and can communicate together via localhost.
 ```
 kubectl run hello-app --image=gcr.io/google-samples/hello-app:1.0
 kubectl get pod -o wide
@@ -75,23 +75,24 @@ kubectl exec --stdin --tty hello-app -- /bin/sh
 kubectl delete pod hello-app
 ```
 
-Export objects to YAML
+## YAML manifests
 ```
 kubectl run hello-app --image=gcr.io/google-samples/hello-app:1.0
 kubectl get pod hello-app-nordine -o yaml
 ```
 
-Scaffold YAML
+## Scaffold YAML using `kubectl`
+We generally use `kubectl` to avoid writing YAML from scratch:
 ```
 kubectl run hello-app --image=gcr.io/google-samples/hello-app:1.0  --dry-run=client -o yaml > mypod.yaml 
 kubectl apply -f mypod.yml
 ```
 
-`kubectl apply` vs `kubectl create`
-
-Clean up
+## Create and configure Jobs and CronJobs
 ```
-kubectl delete pod hello-app
+k run job --dry-run=client -o yaml --image=busybox --restart=OnFailure -- /bin/sh -c "sleep 4800" 
+
+kubectl create cronjob nordine-cronjob --dry-run=client -o yaml --image=busybox --restart=OnFailure --schedule="*/1 * * * *" -- date 
 ```
 
 ## Create and configure deployments
@@ -189,23 +190,27 @@ kubectl exec --stdin --tty hello-app-nordine -- /bin/sh
 ```
 
 ## Volumes
-This will require some explanations 😅
+Volumes are used to shared storage between all containers running in a Pod. This tutorial demonstrates how to use:
+* Persisten Volume Claims and Persisten Volumes
+* emptyDir
+* directory-on-host
+
 ```
 kubectl apply -f k-volumes/pvc.yaml
 kubectl apply -f k-volumes/pod-volume-demo.yaml
 kubectl exec --stdin --tty hello-app -- /bin/sh
 ```
 
-## Create and configure Jobs and CronJobs
-```
-k run job --dry-run=client -o yaml --image=busybox --restart=OnFailure -- /bin/sh -c "sleep 4800" 
+## References 
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
-kubectl create cronjob nordine-cronjob --dry-run=client -o yaml --image=busybox --restart=OnFailure --schedule="*/1 * * * *" -- date 
 ```
-
-## SecurityContexts
-```
-kubectl apply -f securitycontext.yaml
+kubectl run --help
+kubectl api-resources
+kubectl api-versions
+kubectl explain pods
+kubectl explain pods.spec.containers.imagePullPolicy
+kubectl explain pods --recursive
 ```
 
 

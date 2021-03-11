@@ -1,6 +1,0 @@
-{
-    "terminal.integrated.rightClickBehavior":"default",
-    "[yaml]": {
-        "editor.autoIndent": "advanced"
-      }
-}
